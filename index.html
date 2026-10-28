@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meu Discord</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="login">
+  <form id="loginForm">
+    <h1>Meu Discord</h1>
+    <p>Chat, voz, câmera e tela com seus amigos.</p>
+    <input id="nameInput" maxlength="24" placeholder="Seu apelido" autofocus required>
+    <button type="submit">Entrar</button>
+  </form>
+</div>
+
+<div id="app" class="hidden">
+  <aside id="sidebar">
+    <div class="section">Canais de texto</div>
+    <div id="textList"></div>
+    <div class="section">Canais de voz</div>
+    <div id="voiceList"></div>
+    <div id="me"></div>
+  </aside>
+
+  <main id="main">
+    <section id="stage" class="hidden">
+      <div id="grid"></div>
+      <div id="controls">
+        <button id="btnMic" title="Microfone">🎤 Mic</button>
+        <button id="btnDeaf" title="Ensurdecer">🎧 Som</button>
+        <button id="btnCam" title="Câmera">📷 Câmera</button>
+        <button id="btnScreen" title="Compartilhar tela">🖥️ Tela</button>
+        <button id="btnLeave" class="danger" title="Sair da sala">📞 Sair</button>
+      </div>
+    </section>
+
+    <section id="chat">
+      <header id="chatTitle"></header>
+      <div id="messages"></div>
+      <form id="msgForm">
+        <input id="msgInput" autocomplete="off" placeholder="Enviar mensagem...">
+      </form>
+    </section>
+  </main>
+</div>
+
+<script src="config.js"></script>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
