@@ -10,6 +10,9 @@ const origins = process.env.ALLOWED_ORIGIN ? process.env.ALLOWED_ORIGIN.split(',
 const io = new Server(server, { maxHttpBufferSize: 1e6, cors: { origin: origins } });
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.get('/', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 app.get('/health', (_req, res) => res.send('ok'));
 
 const TEXT_CHANNELS = ['geral', 'jogos', 'memes'];
