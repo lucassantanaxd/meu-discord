@@ -139,8 +139,11 @@ function leaveVoice() {
   micStream = null; camTrack = null;
   tiles.forEach((el) => el.remove());
   tiles.clear();
+  focusKey = null; chatHidden = false;
+  $('#btnChat').classList.remove('off');
   currentVoice = null;
   $('#stage').classList.add('hidden');
+  applyFocus();
   renderChannels();
 }
 
@@ -243,15 +246,47 @@ function addTile(key, label, stream, local) {
   lb.className = 'label'; lb.textContent = label;
   const fs = document.createElement('button');
   fs.className = 'fs'; fs.textContent = '⛶';
-  fs.onclick = () => v.requestFullscreen && v.requestFullscreen();
+  fs.title = 'Tela cheia do navegador';
+  fs.onclick = (e) => { e.stopPropagation(); v.requestFullscreen && v.requestFullscreen(); };
+  el.title = 'Clique para ampliar';
+  el.onclick = () => toggleFocus(key);
   el.append(v, av, lb, fs);
   $('#grid').appendChild(el);
   tiles.set(key, el);
   v.play().catch(() => {});
 }
-function removeTile(key) { const el = tiles.get(key); if (el) { el.remove(); tiles.delete(key); } }
+function removeTile(key) {
+  const el = tiles.get(key);
+  if (el) { el.remove(); tiles.delete(key); }
+  if (focusKey === key) { focusKey = null; applyFocus(); }
+}
 function setNoVideo(key, on) { const el = tiles.get(key); if (el) el.classList.toggle('noVideo', on); }
 function relabel(key, text) { const el = tiles.get(key); if (el) el.querySelector('.label').textContent = text; }
+
+// ---------- Modo foco (ampliar um vídeo sem tela cheia) ----------
+let focusKey = null;
+function toggleFocus(key) {
+  focusKey = focusKey === key ? null : key;
+  applyFocus();
+}
+function applyFocus() {
+  const grid = $('#grid');
+  grid.classList.toggle('focus', !!focusKey);
+  tiles.forEach((el, k) => el.classList.toggle('focused', k === focusKey));
+  // Ao ampliar, esconde o chat para dar mais espaço; ao sair, mostra de novo
+  const hideChat = !!currentVoice && (!!focusKey || chatHidden);
+  $('#chat').classList.toggle('hidden', hideChat);
+  $('#stage').classList.toggle('big', hideChat);
+}
+let chatHidden = false;
+$('#btnChat').onclick = () => {
+  chatHidden = !chatHidden;
+  $('#btnChat').classList.toggle('off', chatHidden);
+  applyFocus();
+};
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && focusKey) { focusKey = null; applyFocus(); }
+});
 
 // ---------- Controles ----------
 function updateButtons() {
