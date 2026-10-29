@@ -7,12 +7,21 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div id="banner" class="hidden"></div>
+<div id="toast" class="hidden"></div>
+
 <div id="login">
-  <form id="loginForm">
+  <form id="authForm">
     <h1>Meu Discord</h1>
     <p>Chat, voz, câmera e tela com seus amigos.</p>
-    <input id="nameInput" maxlength="24" placeholder="Seu apelido" autofocus required>
-    <button type="submit">Entrar</button>
+    <div class="tabs">
+      <button type="button" id="tabLogin" class="tab active">Entrar</button>
+      <button type="button" id="tabReg" class="tab">Criar conta</button>
+    </div>
+    <input id="userInput" maxlength="20" placeholder="Usuário" autocomplete="username" required autofocus>
+    <input id="passInput" type="password" maxlength="100" placeholder="Senha (mín. 6 caracteres)" autocomplete="current-password" required>
+    <div id="authErr" class="err"></div>
+    <button type="submit" id="authBtn">Entrar</button>
   </form>
 </div>
 
@@ -22,7 +31,15 @@
     <div id="textList"></div>
     <div class="section">Canais de voz</div>
     <div id="voiceList"></div>
-    <div id="me"></div>
+    <div class="section" id="onlineTitle">Online</div>
+    <div id="onlineList"></div>
+    <div id="me">
+      <span id="meName"></span>
+      <span class="meBtns">
+        <button id="btnAdmin" class="small hidden" title="Painel de admin">⚙️</button>
+        <button id="btnLogout" class="small" title="Sair da conta">⎋</button>
+      </span>
+    </div>
   </aside>
 
   <main id="main">
@@ -46,6 +63,22 @@
       </form>
     </section>
   </main>
+</div>
+
+<div id="adminModal" class="modal hidden">
+  <div class="modalBox">
+    <header>
+      <b>Painel de admin</b>
+      <button id="adminClose" class="small">✕</button>
+    </header>
+    <div class="adminActions">
+      <button id="btnBackup">⬇️ Baixar backup</button>
+      <button id="btnRestore" class="danger">⬆️ Restaurar backup</button>
+      <input type="file" id="restoreFile" accept=".json,application/json" class="hidden">
+    </div>
+    <p class="muted" id="adminInfo"></p>
+    <div id="adminUsers"></div>
+  </div>
 </div>
 
 <script src="config.js"></script>
