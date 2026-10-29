@@ -10,20 +10,7 @@
 <div id="banner" class="hidden"></div>
 <div id="toast" class="hidden"></div>
 
-<div id="login">
-  <form id="authForm">
-    <h1>Meu Discord</h1>
-    <p>Chat, voz, câmera e tela com seus amigos.</p>
-    <div class="tabs">
-      <button type="button" id="tabLogin" class="tab active">Entrar</button>
-      <button type="button" id="tabReg" class="tab">Criar conta</button>
-    </div>
-    <input id="userInput" maxlength="20" placeholder="Usuário" autocomplete="username" required autofocus>
-    <input id="passInput" type="password" maxlength="100" placeholder="Senha (mín. 6 caracteres)" autocomplete="current-password" required>
-    <div id="authErr" class="err"></div>
-    <button type="submit" id="authBtn">Entrar</button>
-  </form>
-</div>
+<div id="login" class="hidden" aria-hidden="true"></div>
 
 <div id="app" class="hidden">
   <aside id="sidebar">
@@ -37,7 +24,7 @@
       <span id="meName"></span>
       <span class="meBtns">
         <button id="btnAdmin" class="small hidden" title="Painel de admin">⚙️</button>
-        <button id="btnLogout" class="small" title="Sair da conta">⎋</button>
+        <button id="btnLogout" class="small" title="Trocar visitante">↻</button>
       </span>
     </div>
   </aside>
