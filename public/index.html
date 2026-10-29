@@ -10,7 +10,13 @@
 <div id="banner" class="hidden"></div>
 <div id="toast" class="hidden"></div>
 
-<div id="login" class="hidden" aria-hidden="true"></div>
+<div id="login" class="login-loading">
+  <div class="login-card">
+    <h1>Meu Discord</h1>
+    <p>Conectando como visitante…</p>
+    <div class="loader" aria-label="Carregando"></div>
+  </div>
+</div>
 
 <div id="app" class="hidden">
   <aside id="sidebar">
@@ -24,7 +30,7 @@
       <span id="meName"></span>
       <span class="meBtns">
         <button id="btnAdmin" class="small hidden" title="Painel de admin">⚙️</button>
-        <button id="btnLogout" class="small" title="Trocar visitante">↻</button>
+        <button id="btnLogout" class="small" title="Sair da conta">⎋</button>
       </span>
     </div>
   </aside>
