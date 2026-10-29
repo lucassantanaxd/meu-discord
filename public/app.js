@@ -64,27 +64,16 @@ async function api(path, { method = 'GET', body } = {}) {
 
 // ---------------------------------------------------------------- Sessão automática de visitante (sem tela de login)
 async function createGuestSession() {
-  // Reutiliza a sessão se já existir; se não, cria uma conta temporária automaticamente.
-  // Isso evita a tela de login, mas depende de o servidor permitir /api/register.
-  const maxAttempts = 5;
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+  try {
     const suffix = Math.random().toString(36).slice(2, 8).toUpperCase();
-    const username = 'Visitante-' + suffix;
-    const password = (globalThis.crypto?.randomUUID?.() || (Date.now() + '-' + Math.random())) + 'Aa1!';
-    try {
-      const d = await api('/api/register', { method: 'POST', body: { username, password } });
-      token = d.token;
-      if (!token) throw new Error('O servidor não retornou um token de sessão.');
-      ls.set('token', token);
-      ls.set('lastUser', username);
-      startSession();
-      return;
-    } catch (err) {
-      // Uma colisão de nome pode acontecer; tenta outro nome. Erros de servidor serão exibidos abaixo.
-      if (attempt === maxAttempts - 1) {
-        banner('Não foi possível entrar como visitante. O servidor precisa permitir cadastro automático: ' + err.message);
-      }
-    }
+    const requestedName = 'Visitante-' + suffix;
+    const d = await api('/api/guest', { method: 'POST', body: { name: requestedName } });
+    token = d.token || '';
+    ls.set('token', token);
+    ls.set('lastUser', d.name || requestedName);
+    startSession();
+  } catch (err) {
+    banner('Não foi possível entrar como visitante: ' + err.message + '. Confira se o Render terminou o deploy.');
   }
 }
 
@@ -108,6 +97,8 @@ function startSession() {
     reconnectionDelay: 500,
     reconnectionDelayMax: 3000,
   });
+
+  socket.on('connect', () => { socket.emit('join', ls.get('lastUser') || 'Visitante'); });
 
   socket.on('connect_error', (err) => {
     if (err && err.message === 'auth') {
