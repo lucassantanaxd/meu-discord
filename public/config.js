@@ -1,5 +1,3 @@
-// Endereço do servidor de sinalização (o que roda server.js).
-// Deixe vazio ('') se o site e o servidor estiverem no mesmo domínio.
-// No Vercel: coloque aqui o link do Render, por exemplo:
-// window.SERVER_URL = 'https://meu-discord-server.onrender.com';
+// Render serve tanto o site quanto o Socket.IO neste domínio; deixe vazio.
+// Se hospedar o frontend no Vercel, coloque aqui a URL do serviço Render.
 window.SERVER_URL = '';
