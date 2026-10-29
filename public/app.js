@@ -62,42 +62,34 @@ async function api(path, { method = 'GET', body } = {}) {
   return d;
 }
 
-// ---------------------------------------------------------------- Login / conta
-let mode = 'login';
-function setMode(m) {
-  mode = m;
-  $('#tabLogin').classList.toggle('active', m === 'login');
-  $('#tabReg').classList.toggle('active', m === 'register');
-  $('#authBtn').textContent = m === 'login' ? 'Entrar' : 'Criar conta';
-  $('#passInput').autocomplete = m === 'login' ? 'current-password' : 'new-password';
-  $('#authErr').textContent = '';
+// ---------------------------------------------------------------- Sessão automática de visitante (sem tela de login)
+async function createGuestSession() {
+  // Reutiliza a sessão se já existir; se não, cria uma conta temporária automaticamente.
+  // Isso evita a tela de login, mas depende de o servidor permitir /api/register.
+  const maxAttempts = 5;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const suffix = Math.random().toString(36).slice(2, 8).toUpperCase();
+    const username = 'Visitante-' + suffix;
+    const password = (globalThis.crypto?.randomUUID?.() || (Date.now() + '-' + Math.random())) + 'Aa1!';
+    try {
+      const d = await api('/api/register', { method: 'POST', body: { username, password } });
+      token = d.token;
+      if (!token) throw new Error('O servidor não retornou um token de sessão.');
+      ls.set('token', token);
+      ls.set('lastUser', username);
+      startSession();
+      return;
+    } catch (err) {
+      // Uma colisão de nome pode acontecer; tenta outro nome. Erros de servidor serão exibidos abaixo.
+      if (attempt === maxAttempts - 1) {
+        banner('Não foi possível entrar como visitante. O servidor precisa permitir cadastro automático: ' + err.message);
+      }
+    }
+  }
 }
-$('#tabLogin').onclick = () => setMode('login');
-$('#tabReg').onclick = () => setMode('register');
-$('#userInput').value = ls.get('lastUser') || '';
-
-$('#authForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  $('#authErr').textContent = '';
-  $('#authBtn').disabled = true;
-  try {
-    const username = $('#userInput').value.trim();
-    const d = await api(mode === 'login' ? '/api/login' : '/api/register', {
-      method: 'POST', body: { username, password: $('#passInput').value },
-    });
-    token = d.token;
-    ls.set('token', token);
-    ls.set('lastUser', username);
-    $('#passInput').value = '';
-    startSession();
-  } catch (err) {
-    $('#authErr').textContent = err.message === 'Failed to fetch'
-      ? 'Servidor indisponível. Se ele estava dormindo, espere 30 s e tente de novo.'
-      : err.message;
-  } finally { $('#authBtn').disabled = false; }
-});
 
 function logout() {
+  // Sem login: limpa a sessão atual e recarrega para criar outro visitante.
   ls.del('token');
   token = null;
   try { if (currentVoice) leaveVoice(); } catch (_) {}
@@ -122,8 +114,8 @@ function startSession() {
       ls.del('token'); token = null;
       socket.disconnect();
       $('#app').classList.add('hidden');
-      $('#login').classList.remove('hidden');
-      $('#authErr').textContent = 'Sessão expirada. Entre de novo.';
+      banner('Sessão de visitante expirada. Criando outra sessão…');
+      createGuestSession();
     } else {
       banner('Sem conexão com o servidor. Tentando de novo…');
     }
@@ -598,3 +590,4 @@ $('#restoreFile').onchange = async (e) => {
 
 // ---------------------------------------------------------------- Início
 if (token) startSession();
+else createGuestSession();
